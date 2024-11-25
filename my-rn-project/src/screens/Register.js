@@ -21,7 +21,7 @@ class Register extends Component {
     console.log("Contraseña:", password);
     console.log("Email:", email);
   
-    // Validaciones
+ 
     if (!userName || userName.length < 5) {
       this.setState({ error: "El nombre no puede tener menos de 5 caracteres" });
       return;
@@ -35,13 +35,13 @@ class Register extends Component {
       return;
     }
   
-    // Crear usuario con Firebase Auth
+   
     auth
       .createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
         const user = userCredential.user;
   
-        // Agregar datos adicionales a Firestore
+
         return db.collection("users").add({
           email: email,
           userName: userName,
