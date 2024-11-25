@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Button } from 'react-native';
 import { db, auth } from '../firebase/config';
-
+import Post from '../components/Post';
 class Profile extends Component {
   constructor(props) {
     super(props);
@@ -16,31 +16,23 @@ class Profile extends Component {
     const user = auth.currentUser;
 
     if (user) {
-      
       this.setState({
         email: user.email,
-        username: user.displayName || 'Usuario sin nombre',
+        username: user.displayName ,
       });
 
-     
-      db.collection('posts')
-        .where('owner', '==', user.email) 
-        .onSnapshot(
-          (snapshot) => {
-            if (!snapshot.empty) {
-              const userPosts = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-              }));
-              this.setState({ posts: userPosts });
-            } else {
-              this.setState({ posts: [] }); 
-            }
-          },
-          (error) => {
-            console.error('Error al obtener los posteos:', error.message);
-          }
-        );
+      db.collection('posts').where('email', '==', auth.currentUser.email).onSnapshot(
+        docs => {
+            let posts = []
+            docs.forEach(doc => {
+                posts.push({
+                    id: doc.id,
+                    data: doc.data()
+                })
+            })
+            this.setState({posts: posts})
+        }
+    )
     }
   }
 
@@ -70,18 +62,25 @@ class Profile extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Mi Perfil</Text>
-        <Text style={styles.text}>Nombre de usuario: {this.state.username}</Text>
-        <Text style={styles.text}>Email: {this.state.email}</Text>
-        <Text style={styles.text}>Total de posteos: {this.state.posts.length}</Text>
+
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Mi Perfil</Text>
+        </View>
+
+
+        <View style={styles.userInfo}>
+          <Text style={styles.userText}>Nombre de usuario: {this.state.username}</Text>
+          <Text style={styles.userText}>Email: {this.state.email}</Text>
+          <Text style={styles.userText}>Total de posteos: {this.state.posts.length}</Text>
+        </View>
+
 
         <FlatList
           data={this.state.posts}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.post}>
-              <Text style={styles.postText}>{item.description}</Text>
-              <TouchableOpacity
+              <Post data={item}/>              <TouchableOpacity
                 style={styles.deleteButton}
                 onPress={() => this.handleDeletePost(item.id)}
               >
@@ -90,6 +89,7 @@ class Profile extends Component {
             </View>
           )}
         />
+
 
         <TouchableOpacity style={styles.logoutButton} onPress={() => this.handleLogout()}>
           <Text style={styles.logoutButtonText}>CERRAR SESIÓN</Text>
@@ -102,64 +102,84 @@ class Profile extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#1a1a1a',
+  },
+  header: {
+    backgroundColor: '#15202B',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#38444D',
+  },
+  headerText: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
+    fontFamily: 'Arial',
+  },
+  userInfo: {
+    backgroundColor: '#192734',
     padding: 20,
-    backgroundColor: '#f9f9f9',
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    marginBottom: 20,
-    color: '#333',
-    textAlign: 'center',
-  },
-  text: {
-    fontSize: 16,
-    color: '#555',
-    marginBottom: 10,
-  },
-  post: {
-    backgroundColor: '#fff',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 8,
+    margin: 15,
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  userText: {
+    fontSize: 20,
+    color: '#8899A6',
+    marginBottom: 10,
+    fontFamily: 'Arial',
+  },
+  post: {
+    backgroundColor: '#192734',
+    padding: 15,
+    marginVertical: 10,
+    marginHorizontal: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 2,
   },
   postText: {
-    fontSize: 14,
-    color: '#333',
+    fontSize: 20,
+    color: '#E1E8ED',
     marginBottom: 10,
+    fontFamily: 'Arial',
   },
   deleteButton: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#ff4d4d',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    alignSelf: 'flex-end',
+    backgroundColor: '#E0245E',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
     borderRadius: 5,
   },
   deleteText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '600',
   },
   logoutButton: {
-    marginTop: 20,
-    backgroundColor: '#007BFF',
+    backgroundColor: '#15202B',
+    margin: 20,
     paddingVertical: 12,
     borderRadius: 8,
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 2,
   },
   logoutButtonText: {
-    textAlign: 'center',
     color: '#fff',
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '600',
   },
 });
