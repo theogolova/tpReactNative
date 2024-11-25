@@ -1,8 +1,7 @@
 import HomeMenu from "./src/components/HomeMenu";
 import Login from "./src/screens/Login";
 import Register from "./src/screens/Register";
-import NuevoPost from "./src/screens/NuevoPost"; 
-import Usuarios from "./src/screens/Usuarios"; 
+
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -28,16 +27,6 @@ export default function App() {
           options={{ headerShown: false }}
           name="HomeMenu"
           component={HomeMenu}
-        />
-        <Stack.Screen
-          name="NuevoPost" 
-          component={NuevoPost}
-          options={{ headerShown: true }}
-        />
-        <Stack.Screen
-          name="Usuarios"
-          component={Usuarios}
-          options={{ headerShown: true }}
         />
       </Stack.Navigator>
     </NavigationContainer>

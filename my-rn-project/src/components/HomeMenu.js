@@ -17,7 +17,7 @@ function HomeMenu() {
       <Tab.Screen
         name="NuevoPost" 
         component={NuevoPost}
-        options={{ headerShown: true, title: 'Nuevo Post' }}
+        options={{ headerShown: false, title: 'Nuevo Post' }}
       />
       <Tab.Screen
         name="Profile"
