@@ -6,9 +6,11 @@ import {
   FlatList,
   ActivityIndicator,
   TextInput,
+  
 } from "react-native";
 import { db } from "../firebase/config";
 import Post from "../components/Post";
+
 
 class Home extends Component {
   constructor(props) {
@@ -23,30 +25,23 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    db.collection("posts")
-      .orderBy("createdAt", "desc")
-      .onSnapshot(
-        (snapshot) => {
-          const posts = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          this.setState({ posts, filteredPosts: posts, loading: false });
-          console.log("Posts obtenidos:", posts);
-        },
-        (error) => {
-          console.error("Error al obtener los posts:", error);
-          this.setState({ loading: false, error: true });
-        }
-      );
+    db.collection('posts').orderBy('createdAt','desc').onSnapshot((docs) => {
+      let post = []
+      docs.forEach(doc => {
+          post.push({
+              id : doc.id,
+              data: doc.data()
+          })
+      })
+      this.setState({ posts: post , filteredPosts: post, loading: false})
+  })
   }
 
   handleSearch = (query) => {
-    const { posts } = this.state;
-    const filteredPosts = posts.filter(
+    
+    const filteredPosts = this.state.posts.filter(
       (post) =>
-        post.email.toLowerCase().includes(query.toLowerCase()) || 
-        post.userName?.toLowerCase().includes(query.toLowerCase()) 
+        post.data.email.toLowerCase().includes(query.toLowerCase())
     );
     this.setState({ searchQuery: query, filteredPosts });
   };
@@ -95,27 +90,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#1a1a1a", 
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
+    backgroundColor: "#15202B", 
+    padding: 15,
+    borderRadius: 10,
   },
   heading: {
-    fontSize: 30,
-    fontWeight: "700",
+    fontSize: 36, 
+    fontWeight: "bold",
+    color: "#ffffff", 
   },
   searchInput: {
-    flex: 1,
-    height: 40,
+    flex: 0.7, 
+    height: 36,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#38444D",
     borderRadius: 8,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8, 
     marginLeft: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#192734", 
+    color: "#ffffff", 
+    fontSize: 14, 
   },
   loadingContainer: {
     flex: 1,
@@ -129,13 +130,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
     fontSize: 18,
-    color: "#777",
+    color: "#8899A6",
   },
   errorText: {
     textAlign: "center",
     marginTop: 20,
     fontSize: 18,
-    color: "red",
+    color: "#E0245E", 
   },
 });
 
