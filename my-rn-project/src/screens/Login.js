@@ -21,8 +21,7 @@ class Login extends Component {
   componentDidMount() {
     auth.onAuthStateChanged((user) => {
       if (user) {
-        
-        this.props.navigation.replace("HomeMenu");
+        this.props.navigation.navigate("HomeMenu");
       } else {
         console.log("No hay usuario logueado.");
       }
@@ -43,33 +42,45 @@ class Login extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.heading}>Ingresar</Text>
+
+        <Text style={styles.headerText}>C0MM3ENTS</Text>
+        
+       
+        <Text style={styles.subHeading}>Ingresar</Text>
+        
         {this.state.error ? (
           <Text style={styles.error}>{this.state.error}</Text>
         ) : null}
+
+        
         <TextInput
           style={styles.input}
           keyboardType="email-address"
           placeholder="Ingrese su email"
-          placeholderTextColor="#888"
+          placeholderTextColor="#8899A6"
           onChangeText={(text) => this.setState({ email: text })}
           value={this.state.email}
         />
         <TextInput
           style={styles.input}
           placeholder="Ingrese su contraseña"
-          placeholderTextColor="#888"
+          placeholderTextColor="#8899A6"
           secureTextEntry={true}
           onChangeText={(text) => this.setState({ password: text })}
           value={this.state.password}
         />
+        
+        
         <TouchableOpacity
           onPress={() => this.handleSubmit()}
           style={[styles.button, styles.buttonPrimary]}
         >
           <Text style={styles.buttonText}>Acceder</Text>
         </TouchableOpacity>
+
         <Text style={styles.linkText}>¿No tienes cuenta?</Text>
+
+        
         <TouchableOpacity
           onPress={() => this.props.navigation.navigate("Register")}
           style={[styles.button, styles.buttonSecondary]}
@@ -83,31 +94,35 @@ class Login extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    margin: 20,
+    flex: 1,
+    backgroundColor: '#1a1a1a',
     padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    justifyContent: "center",
   },
-  heading: {
-    fontSize: 32,
+  headerText: {
+    fontSize: 36, 
     fontWeight: "bold",
-    marginBottom: 20,
-    color: "#333",
+    color: "#fff", 
     textAlign: "center",
+    marginBottom: 20,
+  },
+  subHeading: {
+    fontSize: 24, 
+    fontWeight: "bold",
+    color: "#8899A6", 
+    textAlign: "center",
+    marginBottom: 30,
   },
   input: {
     height: 50,
-    borderColor: "#ccc",
+    borderColor: '#38444D',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 15,
     marginBottom: 15,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: '#192734', 
+    color: '#E1E8ED', 
+    fontSize: 16,
   },
   button: {
     borderRadius: 8,
@@ -116,13 +131,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonPrimary: {
-    backgroundColor: "#007BFF",
-    borderColor: "#007BFF",
+    backgroundColor: "#15202B",
+    borderColor: "#15202B",
     borderWidth: 1,
   },
   buttonSecondary: {
-    backgroundColor: "#28a745",
-    borderColor: "#28a745",
+    backgroundColor: "#E0245E",
+    borderColor: "#E0245E",
     borderWidth: 1,
   },
   buttonText: {
@@ -134,7 +149,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontSize: 16,
     textAlign: "center",
-    color: "#555",
+    color: "#8899A6",
   },
   error: {
     color: "red",
