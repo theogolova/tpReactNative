@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { auth, db } from "../firebase/config"; 
+import { auth, db } from "../firebase/config";
 
 class Register extends Component {
   constructor(props) {
@@ -15,56 +15,60 @@ class Register extends Component {
   }
 
   handleSubmit() {
-    const { email, password, userName, bio } = this.state;
-
-    if (!email || !password || !userName) {
-      this.setState({ error: "Todos los campos son obligatorios" });
+    const { userName, email, password, bio } = this.state;
+  
+    console.log("Nombre de usuario:", userName);
+    console.log("Contraseña:", password);
+    console.log("Email:", email);
+  
+    // Validaciones
+    if (!userName || userName.length < 5) {
+      this.setState({ error: "El nombre no puede tener menos de 5 caracteres" });
       return;
     }
-
+    if (!email || !email.includes("@")) {
+      this.setState({ error: "El email tiene un formato inválido" });
+      return;
+    }
+    if (!password || password.length < 6) {
+      this.setState({ error: "La contraseña no puede tener menos de 6 caracteres" });
+      return;
+    }
+  
+    // Crear usuario con Firebase Auth
     auth
       .createUserWithEmailAndPassword(email, password)
-      .then((response) => {
-        const user = response.user;
-
-        
-        user
-          .updateProfile({
-            displayName: userName,
-          })
-          .then(() => {
-            
-            db.collection("users")
-              .doc(user.uid) 
-              .set({
-                email: email,
-                userName: userName,
-                bio: bio,
-                createdAt: new Date(), 
-              })
-              .then(() => {
-                this.props.navigation.navigate("Login"); 
-              })
-              .catch((error) => {
-                console.error("Error al guardar datos en Firestore:", error.message);
-                this.setState({ error: "Error al guardar datos adicionales en Firestore" });
-              });
-          })
-          .catch((error) => {
-            console.error("Error al actualizar el perfil:", error.message);
-            this.setState({ error: "Error al actualizar el perfil del usuario" });
-          });
+      .then((userCredential) => {
+        const user = userCredential.user;
+  
+        // Agregar datos adicionales a Firestore
+        return db.collection("users").add({
+          email: email,
+          userName: userName,
+          bio: bio,
+          createdAt: Date.now(),
+        });
+      })
+      .then(() => {
+        console.log("Usuario registrado exitosamente");
+        this.props.navigation.navigate("Login");
       })
       .catch((error) => {
-        console.error("Error en el registro:", error.message);
-        this.setState({ error: error.message }); 
+        console.error("Error al registrar usuario:", error.message);
+        if (error.code === "auth/email-already-in-use") {
+          this.setState({ error: "El email ya existe" });
+        } else {
+          this.setState({ error: "Error al registrar usuario. Por favor, intente nuevamente." });
+        }
       });
   }
+  
 
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.heading}>Registro</Text>
+        
         {this.state.error ? <Text style={styles.error}>{this.state.error}</Text> : null}
         <TextInput
           style={styles.input}
@@ -111,31 +115,27 @@ class Register extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    margin: 20,
+    flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
+    backgroundColor: "#1a1a1a",
   },
   heading: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#333",
+    color: "#ffffff",
     textAlign: "center",
   },
   input: {
     height: 50,
-    borderColor: "#ccc",
+    borderColor: "#38444D",
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 15,
     marginBottom: 15,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#15202B",
+    color: "#ffffff",
+    fontSize: 16,
   },
   button: {
     borderRadius: 8,
@@ -144,24 +144,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonPrimary: {
-    backgroundColor: "#007BFF",
-    borderColor: "#007BFF",
+    backgroundColor: "#1DA1F2",
+    borderColor: "#1DA1F2",
     borderWidth: 1,
   },
   buttonSecondary: {
-    backgroundColor: "#28a745",
-    borderColor: "#28a745",
+    backgroundColor: "#E0245E",
+    borderColor: "#E0245E",
     borderWidth: 1,
   },
   buttonText: {
-    color: "#fff",
+    color: "#ffffff",
     fontSize: 18,
     fontWeight: "600",
   },
   error: {
-    color: "red",
+    color: "#E0245E",
     marginBottom: 10,
     textAlign: "center",
+    fontSize: 16,
   },
 });
 
